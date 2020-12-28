@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  nginx:
+    build: docker/nginx
+    container_name: krys-nginx
+    working_dir: /var/www/krys.local
+    environment:
+      FASTCGI_CONNECT_TIMEOUT: 300s
+      FASTCGI_READ_TIMEOUT: 300s
+      FASTCGI_SEND_TIMEOUT: 300s
+      CLIENT_MAX_BODY_SIZE: 100M
+    volumes:
+      - .:/var/www/krys.local
+      - ./runtime/logs/nginx:/var/log/nginx
+      - ./tools/docker-local/nginx/sites-enabled:/etc/nginx/sites-enabled
+    ports:
+      - "${LOCAL_NGINX_PORT}:80"
+    depends_on:
+      - php
+    networks:
+      - devnetwork
+  php:
+    build: docker/php
+    container_name: krys-php
+    working_dir: /var/www/krys.local
+    environment:
+      FPM_MAX_CHILDREN: 5
+      FPM_START_SERVERS: 2
+      FPM_MIN_SPARE_SERVERS: 1
+      FPM_MAX_SPARE_SERVERS: 3
+      FPM_ACCESS_LOG_STATUS: 1
+      FPM_SLOWLOG_TIMEOUT: 1s
+      INI_OPCACHE_STATUS: 0
+      INI_DISPLAY_ERRORS: 'On'
+      INI_MAX_EXECUTION_TIME: 300
+      INI_UPLOAD_MAX_SIZE: 100M
+      XDEBUG_CONFIG: ${XDEBUG_CONFIG}
+    volumes:
+      - .:/var/www/krys.local
+      - ./runtime/logs/php:/var/log/php
+      - /opt:/opt
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - devnetwork
+#  php_cli:
+#    build: docker/php
+#    container_name: krys-php-cli
+#    working_dir: /var/www/krys.local
+#    volumes:
+#      - .:/var/www/krys.local
+#      - ./tools/supervisorConfigs/local:/etc/supervisor/conf.d
+#      - ./runtime/logs/php-cli:/var/log/php
+#    networks:
+#      - devnetwork
+networks:
+  devnetwork:
+    external: true

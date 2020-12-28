@@ -1,3 +1,23 @@
+*.iml
+.idea
+.sass-cache
+/vendor
+/runtime
+
+# Mac DS_Store Files
+.DS_Store
+
+node_modules
+tmp_build
+
+# phpunit itself is not needed
+phpunit.phar
+
+# docker files moved to git submodule
+docker
+
+# local
+/.env
 
 ###> symfony/framework-bundle ###
 /.env.local
