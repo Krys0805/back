@@ -14,7 +14,7 @@ tmp_build
 phpunit.phar
 
 # docker files moved to git submodule
-docker
+/docker
 
 # local
 /.env
